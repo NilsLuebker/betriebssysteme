@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <sys/resource.h>
 
-	int data_a = 2;
-	int data_b = 5.0;
-	int data_c = 'a';
+int data_a = 2;
+int data_b = 5.0;
+int data_c = 'a';
 
 void useless_function(void) {
-	printf("\e[33m========================[Function]=========================\e[0m\e[0m\n");
+	printf("\e[33m========================[Function]=========================\e[0m\n");
 	int stack_a = 2;
 	int stack_b = 5.0;
 	int stack_c = 'a';
