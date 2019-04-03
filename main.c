@@ -31,7 +31,7 @@ void print_limit(int resource, char* name) {
 	printf("%s:\t [ soft:%ld, hard:%ld ]\n", name, stacklimit.rlim_cur, stacklimit.rlim_max);
 }
 
-int main(int argc, const int* argv[]) {
+int main(int argc, const char* argv[]) {
 	printf("\e[33m=========================[Global]==========================\e[0m\n");
 
 	printf("Data:\t [ a:%p, b:%p, c:%p ]\n", &data_a, &data_b, &data_c);
