@@ -9,8 +9,8 @@ int data_c = 'a';
 void useless_function(void) {
 	printf("\e[33m========================[Function]=========================\e[0m\n");
 	int stack_a = 2;
-	int stack_b = 5.0;
-	int stack_c = 'a';
+	int stack_b = 5;
+	int stack_c = 12;
 
 	int* heap_a = malloc(sizeof(int));
 	int* heap_b = malloc(sizeof(int));
@@ -38,8 +38,8 @@ int main(int argc, const char* argv[]) {
 
 	printf("\e[33m==========================[Main]===========================\e[0m\n");
 	int stack_a = 2;
-	int stack_b = 5.0;
-	int stack_c = 'a';
+	int stack_b = 5;
+	int stack_c = 12;
 
 	int* heap_a = malloc(sizeof(int));
 	int* heap_b = malloc(sizeof(int));
