@@ -1,13 +1,17 @@
+.PHONY: all clean compile run
+
+all: run
+
 clean:
 	@echo -e "\e[32m=======================[Cleaning up]=======================\e[0m"
-	rm -f ./main
+	rm -f ./$(file)
 
 compile:
 	@echo -e "\e[32m========================[Compiling]========================\e[0m"
-	gcc -o main main.c
+	gcc -o $(file) $(file).c
 
 run: compile
 	@echo -e "\e[32m=========================[Running]=========================\e[0m"
-	./main
+	./$(file)
 	@echo -e "\e[32m=======================[Cleaning up]=======================\e[0m"
-	rm -f ./main
+	rm -f ./$(file)
