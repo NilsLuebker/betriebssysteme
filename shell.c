@@ -3,13 +3,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <sys/wait.h>
+#include <stdbool.h>
 
 #define EXECUTABLE_PATH "/bin/"
 
 char* get_word(char** line, size_t* line_size) {
 	char* buf = malloc(*line_size);
 	char* buf_begin = buf;
-	for(int i = 0; i < *line_size || **line == '\0'; i++) {
+	bool found_word = false;
+	for(int i = 1; i < *line_size || **line == '\0'; i++) {
 		if(isspace((unsigned int) **line)) {
 			(*line)++;
 			continue;
@@ -19,55 +22,71 @@ char* get_word(char** line, size_t* line_size) {
 		if(!isspace((unsigned int) **line)) continue;
 		*buf = '\0';
 		buf = buf_begin;
-		line_size -= i;
+		found_word = true;
+		*line_size -= i;
 		break;
 	}
-	char* result = malloc(sizeof(char) * (strlen(buf) + 1));
-	strcpy(result, buf);
-	free(buf);
+	char* result = NULL;
+	if(found_word) {
+		result = malloc(sizeof(char) * (strlen(buf) + 1));
+		strcpy(result, buf);
+	}
+	free(buf_begin);
 	return result;
 }
 
-int parse_line(char* file_path, char** argv, char* line, size_t line_size) {
-	char* buf = malloc(line_size);
-	char* buf_begin = buf;
-	int file_path_set = 0;
-	while(*line) {
+char** get_argv(char* line, size_t line_size) {
+	size_t argv_len = 1;
+	char** argv = malloc(sizeof(char*));
+	argv[0] = (char*) NULL;
+	char* word;
+	while( (word = get_word(&line, &line_size)) ) {
+		argv[argv_len - 1] = word;
+		argv_len++;
+		argv = realloc(argv, sizeof(char*) * argv_len);
+		argv[argv_len - 1] = (char*) NULL;
 	}
-	free(buf);
-	return 0;
+	if(!*argv) return NULL;
+	return argv;
 }
 
 int main(int argc, char** args) {
 	char* line = NULL;
 	size_t line_size = 0;
 
-	printf("$ ");
+	while(true) {
+		printf("$ ");
+		size_t str_len = getline(&line, &line_size, stdin);
+		if(str_len <= 1) {
+			printf("quit\n");
+			return 0;
+		}
+		/* printf("size:%lu len:%lu text:%s", line_size, str_len, line); */
 
-	size_t str_len = getline(&line, &line_size, stdin);
-	if(str_len == -1) {
-		printf("no line\n");
-		return -1;
+		char** argv = get_argv(line, line_size);
+		/* char* file; */
+		/* if(argv) { */
+		/* 	file = malloc(sizeof(char) * (strlen(argv[0]) + 1)); */
+		/* 	strcpy(file, *argv); */
+		/* } */
+
+		pid_t child_pid = fork();
+		if(child_pid == 0) {
+			int error = execvp(argv[0], argv);
+			printf("Error %d\n", error);
+			exit(0);
+		}
+		int status;
+		pid_t pid = waitpid(child_pid, &status, 0);
+		/* printf("pid: %d status: %d\n", pid, status); */
+		/* free(file); */
+		char** argv_begin = argv;
+		while(*argv) {
+			free(*argv);
+			argv++;
+		}
+		free(argv_begin);
 	}
-	printf("size:%lu len:%lu text:%s", line_size, str_len, line);
 
-	printf("%s\n", get_word(&line, &line_size));
-	if(*line != '\0')
-		printf("%s\n", get_word(&line, &line_size));
-
-	/* printf("index:%d\n", getIndex(buf, 'a')); */
-	/* char** argv; */
-	/* char* file_path; */
-	/* parse_line(&file_path, &argv, line, line_size); */
-	/* args = (char**) malloc(3 * sizeof(char*)); */
-	/* args[0] = malloc(sizeof(char) * (strlen("/bin/ls") + 1)); */
-	/* args[0] = "/bin/ls"; */
-	/* args[1] = malloc(sizeof(char) * 4); */
-	/* args[1] = "-la"; */
-	/* args[2] = NULL; */
-
-	/* int error = execvp(file_path, argv); */
-	/* free(line); */
-	/* free(file_path); */
 	return 0;
 }
