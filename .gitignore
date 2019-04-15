@@ -1,3 +1,4 @@
 main
 shell
 *.out
+.gdb_history
