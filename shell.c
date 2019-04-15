@@ -9,16 +9,14 @@ const struct Buildin BUILDINS[BUILDINS_SIZE] = {
 void logout(char** argv) {
 	char* line = NULL;
 	size_t line_size = 0;
-	printf("Are you sure you want to logout? (y/n) ");
 	while(true) {
-		size_t str_len = getline(&line, &line_size, stdin);
+		printf("Are you sure you want to logout? (y/n) ");
+		getline(&line, &line_size, stdin);
 		switch(line[0]) {
 			case 'y':
 				exit(0);
 			case 'n':
 				return;
-			default:
-				printf("Are you sure you want to logout? (y/n) ");
 		}
 	}
 }
@@ -35,22 +33,17 @@ char* get_arg(char** line) {
 	char* buf = malloc(strlen(*line) + 1);
 	char* buf_begin = buf;
 	char* result = NULL;
-	bool found_arg = false;
-	for(int i = 1; **line; i++) {
-		if(isspace((unsigned int) **line)) {
-			(*line)++;
-			continue;
+	while(**line) {
+		if(!isspace((unsigned int) **line)) {
+			*buf = **line;
+			buf++;
+		} else if(buf != buf_begin) {
+			*buf = '\0';
+			result = malloc(sizeof(char) * (strlen(buf_begin) + 1));
+			strcpy(result, buf_begin);
+			break;
 		}
-		*buf = **line;
-		buf++, (*line)++;
-		if(!isspace((unsigned int) **line) && **line != '\0') continue;
-		*buf = '\0';
-		found_arg = true;
-		break;
-	}
-	if(found_arg) {
-		result = malloc(sizeof(char) * (strlen(buf_begin) + 1));
-		strcpy(result, buf_begin);
+		(*line)++;
 	}
 	free(buf_begin);
 	return result;
@@ -67,7 +60,7 @@ char** get_argv(char* line) {
 		argv = realloc(argv, sizeof(char*) * argv_len);
 		argv[argv_len - 1] = (char*) NULL;
 	}
-	if(!*argv) {
+	if(!argv[0]) {
 		free(argv);
 		return NULL;
 	}
