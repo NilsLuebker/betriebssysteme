@@ -1,10 +1,23 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <sys/wait.h>
-#include <stdbool.h>
+#include "shell.h"
+
+const struct Buildin BUILDINS[BUILDINS_SIZE] = {
+	{ .keyword="logout", .func=logout },
+	{ .keyword="exit",   .func=logout },
+	{ .keyword="test",   .func=test }
+};
+
+void logout(char** argv) {
+	printf("bye\n");
+	exit(0);
+}
+
+void test(char** argv) {
+	if(*argv) {
+		printf("Arg: %s\n", *argv);
+	} else {
+		printf("No Args\n");
+	}
+}
 
 char* get_arg(char** line, size_t* line_size) {
 	char* buf = malloc(*line_size);
@@ -43,8 +56,49 @@ char** get_argv(char* line, size_t line_size) {
 		argv = realloc(argv, sizeof(char*) * argv_len);
 		argv[argv_len - 1] = (char*) NULL;
 	}
-	if(!*argv) return NULL;
+	if(!*argv) {
+		free(argv);
+		return NULL;
+	}
 	return argv;
+}
+
+void clean_argv(char** argv) {
+	char** argv_begin = argv;
+	while(*argv) {
+		free(*argv);
+		argv++;
+	}
+	free(argv_begin);
+}
+
+bool execute_buildins(char** argv) {
+	for(int i = 0; i < BUILDINS_SIZE; i++) {
+		if(!strcmp(argv[0], BUILDINS[i].keyword)) {
+			BUILDINS[i].func(++argv);
+			return true;
+		}
+	}
+	return false;
+}
+
+void execute_system(char** argv) {
+	pid_t pid = fork();
+	if(IS_CHILD_PROCESS(pid))
+		child_process(argv[0], argv);
+	else
+		parent_process(pid);
+}
+
+void child_process(char* file, char** argv) {
+	int error = execvp(file, argv);
+	printf("Command not found [%d]\n", error);
+	exit(0);
+}
+
+void parent_process(pid_t child_pid) {
+	int status;
+	pid_t pid = waitpid(child_pid, &status, 0);
 }
 
 int main(int argc, char** args) {
@@ -52,29 +106,18 @@ int main(int argc, char** args) {
 	size_t line_size = 0;
 
 	while(true) {
-		printf("$ ");
+		printf(PROMPT);
 		size_t str_len = getline(&line, &line_size, stdin);
-		if(str_len <= 1) {
-			printf("quit\n");
-			return 0;
-		}
+		if(str_len <= 1) continue;
 
 		char** argv = get_argv(line, str_len);
 
-		pid_t child_pid = fork();
-		if(child_pid == 0) {
-			int error = execvp(argv[0], argv);
-			printf("Command not found [%d]\n", error);
-			exit(0);
-		}
-		int status;
-		pid_t pid = waitpid(child_pid, &status, 0);
-		char** argv_begin = argv;
-		while(*argv) {
-			free(*argv);
-			argv++;
-		}
-		free(argv_begin);
+		if(!argv) continue;
+
+		if(!execute_buildins(argv))
+			execute_system(argv);
+
+		clean_argv(argv);
 	}
 
 	return 0;
