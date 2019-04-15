@@ -16,8 +16,8 @@
 
 void logout(char**);
 void test(char**);
-char* get_arg(char**, size_t*);
-char** get_argv(char*, size_t);
+char* get_arg(char**);
+char** get_argv(char*);
 void clean_argv(char**);
 bool execute_buildins(char**);
 void execute_system(char**);
