@@ -10,19 +10,19 @@
 #include <stdbool.h>
 
 #define BUILDINS_SIZE 3
-#define PROMPT "$ "
+#define PROMPT "\e[93m$\e[39m "
 
 #define IS_CHILD_PROCESS(PID) (PID == 0)
 
-void logout(char** argv);
-void test(char** argv);
-char* get_arg(char** line, size_t* line_size);
-char** get_argv(char* line, size_t line_size);
-void clean_argv(char** argv);
-bool execute_buildins(char** argv);
-void execute_system(char** argv);
-void child_process(char* file, char** argv);
-void parent_process(pid_t child_pid);
+void logout(char**);
+void test(char**);
+char* get_arg(char**, size_t*);
+char** get_argv(char*, size_t);
+void clean_argv(char**);
+bool execute_buildins(char**);
+void execute_system(char**);
+void child_process(char*, char**);
+void parent_process(pid_t);
 
 struct Buildin {
 	char* keyword;
