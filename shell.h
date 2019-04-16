@@ -13,6 +13,8 @@
 #define PROMPT "\e[93m$\e[39m "
 
 #define IS_CHILD_PROCESS(PID) (PID == 0)
+#define STRLEN_INC_NULL(str) (strlen(str) + 1)
+#define LAST_INDEX(arr_len) (arr_len - 1)
 
 void logout(char**);
 void test(char**);
