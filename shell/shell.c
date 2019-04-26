@@ -145,8 +145,6 @@ int main(int argc, char** args) {
 		if(str_len <= 1) continue;
 
 		char** argv = get_argv(line);
-		/* printf("%d\n", check_last_char(argv, '&')); */
-		/* continue; */
 
 		if(!argv) continue;
 
