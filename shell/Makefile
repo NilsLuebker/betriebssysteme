@@ -1,12 +1,15 @@
 CC ?= gcc
-CFLAGS := ${CFLAGS} -O2 -Wextra -Wall -Wfloat-equal -Wundef -Wpointer-arith -Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Winit-self -std=c99
-TARGETS := shell.o
+CFLAGS := ${CFLAGS} -O2 -pedantic -Wextra -Wall -Wfloat-equal -Wundef -Wpointer-arith -Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Winit-self -std=c99
+OBJS := buildins.o argparse.o
+BIN := shell
+DEFS :=
+LIBS :=
 
 .PHONY: all
-all: build run clean
+all: build run
 
 .PHONY: debug
-debug: pre-debug build debug-run clean
+debug: pre-debug build debug-run
 
 .PHONY: debug-run
 debug-run:
@@ -18,14 +21,19 @@ pre-debug:
 
 .PHONY: run
 run:
-	./shell.o
+	./$(BIN)
 
 .PHONY: build
-build: $(TARGETS)
+build: $(BIN)
 
-%.o: %.c
-	$(CC) $< -o $@ $(CFLAGS)
+$(BIN): $(OBJS) $(BIN).c
+	@echo "Building: $(BIN)"
+	$(CC) $(CFLAGS) $(DEFS) $(LIBS) $(OBJS) $(BIN).c -o $(BIN)
+
+%.o: %.c %.h
+	@echo "Building: $@"
+	$(CC) -c $(CFLAGS) $(DEFS) $< -o $@
 
 .PHONY: clean
 clean:
-	rm -f *.o
+	rm -f *.o $(BIN)
