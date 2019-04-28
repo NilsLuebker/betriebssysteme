@@ -7,6 +7,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <signal.h>
 
 #include <sys/wait.h>
 

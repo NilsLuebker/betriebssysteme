@@ -27,6 +27,8 @@ void logout(char** argv) {
 				exit(0);
 			case 'n':
 				return;
+			default:
+				continue;
 		}
 	}
 }
