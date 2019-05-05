@@ -6,9 +6,12 @@ const struct Buildin BUILDINS[BUILDINS_SIZE] = {
 	{ .keyword="test",   .func=&test }
 };
 
-bool execute_buildins(char** argv) {
-	for(int i = 0; i < BUILDINS_SIZE; i++) {
-		if(!strcmp(argv[0], BUILDINS[i].keyword)) {
+bool execute_buildins(char** argv)
+{
+	for(int i = 0; i < BUILDINS_SIZE; i++)
+	{
+		if(!strcmp(argv[0], BUILDINS[i].keyword))
+		{
 			BUILDINS[i].func(++argv);
 			return true;
 		}
@@ -16,13 +19,16 @@ bool execute_buildins(char** argv) {
 	return false;
 }
 
-void logout(char** argv) {
+void logout(char** argv)
+{
 	char* line = NULL;
 	size_t line_size = 0;
-	while(true) {
+	while(true)
+	{
 		printf("Are you sure you want to logout? (y/n) ");
 		getline(&line, &line_size, stdin);
-		switch(line[0]) {
+		switch(line[0])
+		{
 			case 'y':
 				exit(0);
 			case 'n':
@@ -33,10 +39,14 @@ void logout(char** argv) {
 	}
 }
 
-void test(char** argv) {
-	if(*argv) {
+void test(char** argv)
+{
+	if(*argv)
+	{
 		printf("Arg: %s\n", *argv);
-	} else {
+	}
+	else
+	{
 		printf("No Args\n");
 	}
 }

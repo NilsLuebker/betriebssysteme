@@ -8,8 +8,11 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <signal.h>
+#include <termios.h>
+#include <signal.h>
 
 #include <sys/wait.h>
+#include <sys/types.h>
 
 #define PROMPT "\e[93m$\e[39m "
 
@@ -18,5 +21,6 @@
 void execute_system(char**);
 void child_process(char*, char**);
 void parent_process(pid_t);
+int main(int, char**);
 
 #endif /* SHELL_H */
