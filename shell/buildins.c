@@ -1,9 +1,11 @@
 #include "buildins.h"
+#include "jobctl.h"
 
 const struct Buildin BUILDINS[BUILDINS_SIZE] = {
 	{ .keyword="logout", .func=&logout },
 	{ .keyword="exit",   .func=&logout },
-	{ .keyword="test",   .func=&test }
+	{ .keyword="test",   .func=&test },
+	{ .keyword="jobs",   .func=&jobs }
 };
 
 bool execute_buildins(char** argv)
@@ -17,6 +19,10 @@ bool execute_buildins(char** argv)
 		}
 	}
 	return false;
+}
+
+void jobs(char** argv) {
+	print_background_processes();
 }
 
 void logout(char** argv)

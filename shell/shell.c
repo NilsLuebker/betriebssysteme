@@ -2,6 +2,28 @@
 
 interactive_shell shell;
 
+void child_handler(int sig)
+{
+	int child_status;
+	pid_t child_pid = -1;
+	process* child_process;
+	while( (child_pid = waitpid(-1, &child_status, WUNTRACED | WNOHANG)) )
+	{
+		printf("%d\n", child_pid);
+		if(child_pid == -1)
+			break;
+		/* Find child process and update it's status */
+		child_process = find_process(child_pid);
+		child_process->status = child_status;
+		if(WIFEXITED(child_status))
+			child_process->completed = true;
+		if(WIFSTOPPED(child_status))
+			child_process->stopped = true;
+		/* if(WIFCONTINUED(child_pid)) */
+		/* 	child_process->stopped = false; */
+	}
+}
+
 void init_shell()
 {
 	/* See if we are running interactively. */
@@ -21,6 +43,9 @@ void init_shell()
 	signal(SIGTTOU, SIG_IGN);
 	signal(SIGCHLD, SIG_IGN);
 
+	/* Listen for SIGCHLD signals */
+	/* signal(SIGCHLD, &child_handler); */
+
 	/* Put ourselves in our own process group. */
 	shell.pgid = getpid();
 	if(setpgid(shell.pgid, shell.pgid) < 0)
@@ -39,11 +64,13 @@ void init_shell()
 int main(int argc, char** args)
 {
 	init_shell();
+	init_jobctl();
 	char* line = NULL;
 	size_t line_size = 0;
 
 	while(true)
 	{
+		child_handler(0);
 		printf(PROMPT);
 		size_t str_len = getline(&line, &line_size, stdin);
 

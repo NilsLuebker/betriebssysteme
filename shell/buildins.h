@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BUILDINS_SIZE 3
+#define BUILDINS_SIZE 4
 
 struct Buildin {
 	char* keyword;
@@ -14,6 +14,7 @@ struct Buildin {
 };
 
 bool execute_buildins(char**);
+void jobs(char**);
 void logout(char**);
 void test(char**);
 
