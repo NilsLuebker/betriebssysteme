@@ -108,6 +108,7 @@ int main(int argc, char** args)
 	while(true)
 	{
 		child_handler(SIGCHLD);
+		list_gc(background_processes);
 		printf(PROMPT);
 
 		/* Handle child events while waiting for input by the user */

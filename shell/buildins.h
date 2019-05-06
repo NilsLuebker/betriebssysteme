@@ -5,8 +5,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 
-#define BUILDINS_SIZE 4
+#define BUILDINS_SIZE 6
 
 struct Buildin {
 	char* keyword;
@@ -15,6 +16,8 @@ struct Buildin {
 
 bool execute_buildins(char**);
 void jobs(char**);
+void fg(char**);
+void bg(char**);
 void logout(char**);
 void test(char**);
 

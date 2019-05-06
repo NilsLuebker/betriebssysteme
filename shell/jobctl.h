@@ -17,6 +17,7 @@ typedef struct process {
 } process;
 
 typedef struct process_list {
+	size_t length;
 	size_t size;
 	process** first_process;
 } process_list;
@@ -27,14 +28,14 @@ extern process_list* background_processes;
 void init_jobctl(void);
 process* find_process(pid_t);
 process* new_process(char**, pid_t);
+process_list* new_process_list(void);
 void clean_process(process*);
 void move_foreground(process*);
-size_t process_list_append(process*);
-void process_list_remove(process*, bool);
-void process_list_resize(int n);
+size_t list_append(process_list*, process*);
+void list_remove(process_list*, process*, bool);
+void list_resize(process_list*, int n);
+void list_gc(process_list*);
 void print_background_processes(void);
-bool process_is_stopped(pid_t);
-bool process_is_completed(pid_t);
 void execute_system(char**);
 void launch_process(char**, bool);
 void wait_for_foreground_process(void);

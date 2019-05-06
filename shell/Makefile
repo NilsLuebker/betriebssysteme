@@ -17,7 +17,7 @@ debug-run:
 
 .PHONY: pre-debug
 pre-debug:
-	$(eval CFLAGS = -g -Wall -Wextra -pedantic -std=c99)
+	$(eval CFLAGS = -g -Wall -Wextra -pedantic -std=gnu17)
 
 .PHONY: run
 run:

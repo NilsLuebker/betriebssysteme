@@ -7,12 +7,7 @@ process_list* background_processes = NULL;
 
 void init_jobctl()
 {
-	background_processes = malloc(sizeof(process_list));
-	*background_processes = (process_list) {
-		.size=1,
-		.first_process=malloc(sizeof(process*))
-	};
-	background_processes->first_process[0] = NULL;
+	background_processes = new_process_list();
 }
 
 process* new_process(char** argv, pid_t pid)
@@ -28,7 +23,18 @@ process* new_process(char** argv, pid_t pid)
 	/* Put the newly create process into it's own process group */
 	setpgid(result->pid, result->pid);
 	return result;
+}
 
+process_list* new_process_list()
+{
+	process_list* result = malloc(sizeof(process_list));
+	*result = (process_list) {
+		.length=1,
+		.size=1,
+		.first_process=malloc(sizeof(process*))
+	};
+	result->first_process[0] = NULL;
+	return result;
 }
 
 void clean_process(process* p)
@@ -44,12 +50,10 @@ process* find_process(pid_t child_pid)
 		return foreground_process;
 
 	/* Check if child_pid is a background process */
-	process** result = background_processes->first_process;
-	while(result)
+	for(size_t i = 0; i < background_processes->length; i++)
 	{
-		if((*result)->pid == child_pid)
-			return *result;
-		(*result)++;
+		if(background_processes->first_process[i]->pid == child_pid)
+			return background_processes->first_process[i];
 	}
 
 	/* child_pid was not found */
@@ -71,36 +75,36 @@ void move_foreground(process* p)
 	foreground_process = p;
 }
 
-size_t process_list_append(process* p)
+size_t list_append(process_list* list, process* p)
 {
 	/* Resize the array so another process can be inserted */
-	process_list_resize(1);
+	list_resize(list, list->length + 1);
 	
 	/* Append the process */
-	size_t last_elem = background_processes->size - 2;
-	background_processes->first_process[last_elem] = p;
+	size_t last_elem = list->length - 2;
+	list->first_process[last_elem] = p;
 
 	/* Add NULL termination */
-	size_t last_index = background_processes->size - 1;
-	background_processes->first_process[last_index] = NULL;
+	size_t last_index = list->length - 1;
+	list->first_process[last_index] = NULL;
 
 	/* Return the index at which the process was added */
 	return last_elem;
 }
 
-void process_list_remove(process* p, bool clean)
+void list_remove(process_list* list, process* p, bool clean)
 {
 	process* found = NULL;
-	for(size_t i = 0; i < background_processes->size; i++)
+	for(size_t i = 0; i < list->length; i++)
 	{
-		if(background_processes->first_process[i] != p || found)
+		if(list->first_process[i] != p || found)
 			continue;
 		if(!found)
-			found = background_processes->first_process[i];
-		if(i+1 < background_processes->size)
-			background_processes->first_process[i] = background_processes->first_process[i+1];
+			found = list->first_process[i];
+		if(i+1 < list->length)
+			list->first_process[i] = list->first_process[i+1];
 		else
-			background_processes->first_process[i] = NULL;
+			list->first_process[i] = NULL;
 	}
 	if(found)
 	{
@@ -109,31 +113,55 @@ void process_list_remove(process* p, bool clean)
 			clean_process(found);
 			found = NULL;
 		}
-		process_list_resize(-1);
+		list_resize(list, list->length - 1);
 	}
 }
 
-void process_list_resize(int n)
+void list_resize(process_list* list, int new_length)
 {
-	size_t scalar = 1;
+	size_t new_size = 1;
 	size_t i = 0;
 	
-	/* Increment/Decrement process list size */
-	background_processes->size += n;
+	/* Increment/Decrement process list length */
+	list->length = new_length;
 
 	/* Only resize by power of two eg. 2, 4, 8, 16, 32.. */
-	while((scalar<<=++i) < background_processes->size);
+	while((new_size<<=++i) < list->length);
 
-	/* Resize the struct */
-	background_processes->first_process = realloc(
-		background_processes->first_process,
-		sizeof(process*) * scalar
-	);
+	if(new_size != list->size)
+	{
+		/* Resize the struct */
+		list->first_process = realloc(
+			list->first_process,
+			sizeof(process*) * new_size
+		);
+		list->size = new_size;
+	}
+}
+
+void list_gc(process_list* list)
+{
+	process_list* processes_to_remove = new_process_list();
+
+	for(size_t i = 0; i < list->length; i++)
+	{
+		if(!list->first_process[i]) continue;
+		if(list->first_process[i]->completed)
+			list_append(processes_to_remove, list->first_process[i]);
+	}
+
+	for(size_t i = 0; i < processes_to_remove->length; i++)
+	{
+		if(!processes_to_remove->first_process[i]) continue;
+		list_remove(list, processes_to_remove->first_process[i], true);
+	}
+
+	free(processes_to_remove);
 }
 
 void print_background_processes()
 {
-	for(size_t i = 0; i < background_processes->size; i++)
+	for(size_t i = 0; i < background_processes->length; i++)
 	{
 		if(!background_processes->first_process[i])
 			continue;
@@ -186,7 +214,7 @@ void execute_system(char** argv)
 			}
 			else
 			{
-				process_list_append(child_process);
+				list_append(background_processes, child_process);
 			}
 		}
 	}
@@ -229,11 +257,18 @@ void wait_for_foreground_process()
 
 	put_shell_in_foreground();
 
+	/* If the process got a SIGTSTP put it in the background */
 	if(WIFSTOPPED(foreground_process->status))
 	{
 		foreground_process->stopped = true;
-		size_t bgid = process_list_append(foreground_process);
+		size_t bgid = list_append(background_processes, foreground_process);
 		printf("[%lu]+\tStopped\t%s\n", bgid, foreground_process->argv[0]);
-		foreground_process = NULL;
 	}
+	/* If the process was finished clean up */
+	else
+	{
+		clean_process(foreground_process);
+	}
+	/* Don't point at freed memory location */
+	foreground_process = NULL;
 }
