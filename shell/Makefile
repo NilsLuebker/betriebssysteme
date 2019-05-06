@@ -13,7 +13,7 @@ debug: pre-debug build debug-run
 
 .PHONY: debug-run
 debug-run:
-	gdb shell.o
+	gdb $(BIN)
 
 .PHONY: pre-debug
 pre-debug:
