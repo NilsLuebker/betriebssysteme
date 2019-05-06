@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <termios.h>
 #include <signal.h>
+#include <errno.h>
 
 #include <sys/wait.h>
 #include <sys/types.h>
@@ -29,7 +30,10 @@ typedef struct interactive_shell {
 } interactive_shell;
 
 extern interactive_shell shell;
+extern struct sigaction sa_child;
 
+void child_handler(int);
+void put_shell_in_foreground(void);
 void init_shell(void);
 int main(int, char**);
 

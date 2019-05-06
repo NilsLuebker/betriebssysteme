@@ -27,13 +27,16 @@ extern process_list* background_processes;
 void init_jobctl(void);
 process* find_process(pid_t);
 process* new_process(char**, pid_t);
+void clean_process(process*);
 void move_foreground(process*);
-size_t move_background(process*);
+size_t process_list_append(process*);
+void process_list_remove(process*, bool);
+void process_list_resize(int n);
 void print_background_processes(void);
 bool process_is_stopped(pid_t);
 bool process_is_completed(pid_t);
 void execute_system(char**);
 void launch_process(char**, bool);
-void wait_for_foreground_process();
+void wait_for_foreground_process(void);
 
 #endif /* JOBCTL_H */
