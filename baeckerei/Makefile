@@ -2,8 +2,8 @@ CC ?= gcc
 WFLAGS := -Wpedantic -Wextra -Wall -Wformat=2 -Wformat-signedness -Winit-self
 DBGFLAGS := -g
 CFLAGS := ${CFLAGS} -O2 -std=gnu17
-OBJS := buildins.o argparse.o jobctl.o
-BIN := shell
+OBJS :=
+BIN := baeckerei
 DEFS :=
 LIBS := -lpthread
 
@@ -11,7 +11,7 @@ LIBS := -lpthread
 all: build run
 
 .PHONY: debug
-debug: pre-debug build debug-run
+debug: clean pre-debug build debug-run
 
 .PHONY: debug-run
 debug-run:
