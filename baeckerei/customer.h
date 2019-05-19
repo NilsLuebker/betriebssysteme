@@ -11,9 +11,8 @@
 #include "queue.h"
 
 struct customer_s {
-	unsigned int wanted_breads;
-	unsigned int gotten_breads;
-	pthread_mutex_t mut;
+	int wanted_breads;
+	int gotten_breads;
 	sem_t sem;
 };
 
@@ -24,5 +23,6 @@ void customer_stroll(void);
 void customer_init(customer_t* customer);
 customer_t* customer_new();
 void customer_destroy(customer_t* customer);
+void customer_give_breads(customer_t* customer, int breads);
 
 #endif /* CUSTOMER_H */

@@ -2,6 +2,7 @@
 
 void* customer_thread_main(void* data)
 {
+	printf("starting: customer\n");
 	customer_t* self = (customer_t*) data;
 
 	while(true)
@@ -10,9 +11,12 @@ void* customer_thread_main(void* data)
 		if (!baker_has_breads(stock)) continue;
 		if (queue_full(queue)) continue;
 		if (!queue_enqueue(queue, (void*) self)) continue;
-		sem_wait(&self->sem);
 		break;
 	}
+
+	sem_wait(&self->sem);
+
+	printf("Thread %lu got %u breads\n", pthread_self(), self->gotten_breads);
 
 	customer_destroy(self);
 	return NULL;
@@ -25,9 +29,8 @@ void customer_stroll(void)
 
 void customer_init(customer_t* customer)
 {
-	customer->wanted_breads = (unsigned int)((random() % 12) + 1);
+	customer->wanted_breads = (int)((random() % 5) + 1);
 	customer->gotten_breads = 0;
-	pthread_mutex_init(&customer->mut, NULL);
 	sem_init(&customer->sem, 0, 0);
 }
 
@@ -40,7 +43,11 @@ customer_t* customer_new()
 
 void customer_destroy(customer_t* customer)
 {
-	pthread_mutex_destroy(&customer->mut);
 	sem_destroy(&customer->sem);
 	free(customer);
+}
+
+void customer_give_breads(customer_t* customer, int breads)
+{
+	customer->gotten_breads = breads;
 }
