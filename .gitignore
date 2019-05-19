@@ -1,7 +1,6 @@
 *.out
 *.o
 .gdb_history
-*.o
 shell
-baeckerei
+baeckerei/baeckerei
 .vscode

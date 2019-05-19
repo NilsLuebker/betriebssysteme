@@ -2,7 +2,7 @@ CC ?= gcc
 WFLAGS := -Wpedantic -Wextra -Wall -Wformat=2 -Wformat-signedness -Winit-self
 DBGFLAGS := -g
 CFLAGS := ${CFLAGS} -O2 -std=gnu17
-OBJS :=
+OBJS := baker.o customer.o parameters.o queue.o vendor.o
 BIN := baeckerei
 DEFS :=
 LIBS := -lpthread
