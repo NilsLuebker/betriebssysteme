@@ -4,6 +4,8 @@
 #include <stdlib.h>
 
 #include "customer.h"
+#include "baeckerei.h"
+#include "colors.h"
 
 #define NANO_SECOND_MULTIPLIER 1000000
 

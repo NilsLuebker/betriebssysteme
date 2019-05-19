@@ -2,10 +2,10 @@
 
 void* vendor_thread_main(void* data)
 {
-	printf("starting: vendor\n");
+	printf("starting: vendor id[%s%lu%s]\n", MAGENTA, pthread_self(), RESET);
 	customer_t* current_customer = NULL;
-	const struct timespec time_to_sleep = {.tv_nsec=MS_TO_NS(500)};
-	while(true)
+	const struct timespec time_to_sleep = {.tv_nsec=MS_TO_NS(250)};
+	while(number_of_customers)
 	{
 		nanosleep(&time_to_sleep, NULL);
 		if (!baker_has_breads(stock)) continue;

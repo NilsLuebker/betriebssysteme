@@ -9,6 +9,7 @@
 
 #include "baeckerei.h"
 #include "queue.h"
+#include "colors.h"
 
 struct customer_s {
 	int wanted_breads;

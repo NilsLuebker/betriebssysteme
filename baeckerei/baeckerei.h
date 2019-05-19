@@ -16,9 +16,11 @@
 #include "customer.h"
 #include "vendor.h"
 #include "baker.h"
+#include "colors.h"
 
 extern baker_t* stock;
 extern queue_t* queue;
+extern size_t number_of_customers;
 
 int main(int argc, char* argv[]);
 

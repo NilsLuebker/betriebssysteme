@@ -2,7 +2,7 @@
 
 void* customer_thread_main(void* data)
 {
-	printf("starting: customer\n");
+	printf("starting: customer id[%s%lu%s]\n", MAGENTA, pthread_self(), RESET);
 	customer_t* self = (customer_t*) data;
 
 	while(true)
@@ -16,8 +16,20 @@ void* customer_thread_main(void* data)
 
 	sem_wait(&self->sem);
 
-	printf("Thread %lu got %u breads\n", pthread_self(), self->gotten_breads);
-
+	printf(
+		"Thread %s%lu%s got %s%u%s breads and wanted %s%u%s breads\n",
+		MAGENTA,
+		pthread_self(),
+		RESET,
+		GREEN,
+		self->gotten_breads,
+		RESET,
+		BLUE,
+		self->wanted_breads,
+		RESET
+	);
+	
+	number_of_customers--;
 	customer_destroy(self);
 	return NULL;
 }

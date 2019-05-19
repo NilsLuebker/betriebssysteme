@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <pthread.h>
 
+#include <stdio.h>
+
 struct queue_node_s {
 	struct queue_node_s* next;
 	void* data;

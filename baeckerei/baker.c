@@ -2,12 +2,11 @@
 
 void* baker_thread_main(void* data)
 {
-	printf("starting: baker\n");
+	printf("starting: baker id[%s%lu%s]\n", MAGENTA, pthread_self(), RESET);
 	baker_t* self = (baker_t*) data;
-	for(int i = 0; i < 20; i++) {
+	while(number_of_customers) {
 		sleep((unsigned int) self->seconds);
 		baker_add_breads(self, self->breads_per_second);
-		printf("new breads\n");
 	}
 	return NULL;
 }

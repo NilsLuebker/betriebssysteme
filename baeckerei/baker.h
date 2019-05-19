@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 
+#include "colors.h"
 
 struct baker_s {
 	int breads;
@@ -17,6 +18,7 @@ struct baker_s {
 };
 
 typedef struct baker_s baker_t;
+extern size_t number_of_customers;
 
 void* baker_thread_main(void* data);
 void baker_init(baker_t* baker, int breads_per_second, int seconds);

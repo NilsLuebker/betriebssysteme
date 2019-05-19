@@ -2,6 +2,7 @@
 
 baker_t* stock = NULL;
 queue_t* queue = NULL;
+size_t number_of_customers = 0;
 
 int main(int argc, char* argv[])
 {
@@ -19,6 +20,7 @@ int main(int argc, char* argv[])
 	pthread_t baker_thread;
 	pthread_create(&baker_thread, NULL, &baker_thread_main, (void*) stock);
 
+	number_of_customers = (size_t) m;
 	for(int i = 0; i < m; i++)
 	{
 		pthread_t customer_thread;
@@ -30,15 +32,18 @@ int main(int argc, char* argv[])
 		pthread_create(&vendor_thread, NULL, &vendor_thread_main, (void*) NULL);
 	}
 
-	printf("starting: main\n");
+	printf("starting: main id[%s%lu%s]\n", MAGENTA, pthread_self(), RESET);
 
-	for(int i = 1; i < 20; i++) {
+	for(int i = 1; number_of_customers; i++) {
 		sleep(1);
-		printf("breads: %u after %d seconds\n", baker_get_breads(stock), i);
+		printf("breads: %s%d%s after %d seconds\n", GREEN, baker_get_breads(stock), RESET, i);
 	}
 
 	pthread_join(baker_thread, NULL);
 	baker_destroy(stock);
+	stock = NULL;
+	queue_destroy(queue);
+	queue = NULL;
 
 	return 0;
 }

@@ -19,18 +19,22 @@ bool queue_destroy(queue_t* queue)
 
 bool queue_empty(queue_t* queue)
 {
+	bool result = false;
+	pthread_mutex_lock(&queue->mut);
 	if (queue == NULL || queue->front == NULL)
-		return true;
-	else
-		return false;
+		result = true;
+	pthread_mutex_unlock(&queue->mut);
+	return result;
 }
 
 bool queue_full(queue_t* queue)
 {
+	bool result = false;
+	pthread_mutex_lock(&queue->mut);
 	if (queue->size == queue->size_limit)
-		return true;
-	else
-		return false;
+		result = true;
+	pthread_mutex_unlock(&queue->mut);
+	return result;
 }
 
 void queue_init(queue_t* queue, size_t size_limit)
@@ -55,10 +59,13 @@ queue_t *queue_new(size_t size_limit)
 
 void* queue_dequeue(queue_t* queue)
 {
-	if (queue == NULL || queue->front == NULL)
-		return NULL;
-
 	pthread_mutex_lock(&queue->mut);
+	if (queue == NULL || queue->front == NULL)
+	{
+		pthread_mutex_unlock(&queue->mut);
+		return NULL;
+	}
+
 	struct queue_node_s *node = queue->front;
 	void *data = node->data;
 	queue->front = node->next;
@@ -77,14 +84,20 @@ bool queue_enqueue(queue_t* queue, void* data)
 	if (queue == NULL)
 		return false;
 
+	pthread_mutex_lock(&queue->mut);
 	if(queue->size >= queue->size_limit)
+	{
+		pthread_mutex_unlock(&queue->mut);
 		return false;
+	}
 
 	struct queue_node_s* node = malloc(sizeof(*node));
 	if (node == NULL)
+	{
+		pthread_mutex_unlock(&queue->mut);
 		return false;
+	}
 
-	pthread_mutex_lock(&queue->mut);
 	node->data = data;
 	node->next = NULL;
 	if (queue->back == NULL)
