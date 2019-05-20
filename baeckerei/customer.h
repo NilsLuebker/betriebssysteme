@@ -14,6 +14,7 @@
 struct customer_s {
 	int wanted_breads;
 	int gotten_breads;
+	pthread_t vendor;
 	sem_t sem;
 };
 
@@ -24,6 +25,6 @@ void customer_stroll(void);
 void customer_init(customer_t* customer);
 customer_t* customer_new();
 void customer_destroy(customer_t* customer);
-void customer_give_breads(customer_t* customer, int breads);
+void customer_give_breads(customer_t* customer, pthread_t vendor, int breads);
 
 #endif /* CUSTOMER_H */

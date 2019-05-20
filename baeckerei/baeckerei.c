@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 		pthread_create(&vendor_thread, NULL, &vendor_thread_main, (void*) NULL);
 	}
 
-	printf("starting: main id[%s%lu%s]\n", MAGENTA, pthread_self(), RESET);
+	printf("starting: main id[%lu]\n", pthread_self());
 
 	for(int i = 1; number_of_customers; i++) {
 		sleep(1);
