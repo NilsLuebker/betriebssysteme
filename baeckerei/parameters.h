@@ -11,6 +11,8 @@
 struct parameter_s {
 	int name;
 	int default_value;
+	int min_value;
+	int max_value;
 	int* global_ptr;
 };
 

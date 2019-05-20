@@ -3,11 +3,16 @@
 int b, l, m, n, r = 0;
 
 const parameter_t parameter_list[PARAMLIST_SIZE] = {
-	{.name='b', .default_value=3, .global_ptr=&b},  // gebackene broetchen pro r sekunden
-	{.name='l', .default_value=5, .global_ptr=&l}, // maximale laenge der schlange
-	{.name='m', .default_value=10, .global_ptr=&m},  // menge von kunden die sich anstellen
-	{.name='n', .default_value=2, .global_ptr=&n},  // anzahl an mitarbeitern
-	{.name='r', .default_value=1, .global_ptr=&r},  // zeit in sekunden zwischen dem backen der broetchen
+	/* gebackene broetchen pro r sekunden */
+	{.name='b', .default_value=3, .min_value=1, .max_value=15, .global_ptr=&b},
+	/* maximale laenge der schlange */
+	{.name='l', .default_value=5, .min_value=1, .max_value=20, .global_ptr=&l},
+	/* menge von kunden die sich anstellen */
+	{.name='m', .default_value=10, .min_value=1, .max_value=100, .global_ptr=&m},
+	/* anzahl an mitarbeitern */
+	{.name='n', .default_value=2, .min_value=1, .max_value=10, .global_ptr=&n},
+	/* zeit in sekunden zwischen dem backen der broetchen */
+	{.name='r', .default_value=1, .min_value=1, .max_value=5, .global_ptr=&r},
 };
 
 void init_defaults(void)
@@ -48,8 +53,14 @@ void parse_args(int argc, char* argv[])
 				} else if(arg_value == 0) {
 					printf("The value '%s' could not be converted to a number.\n", optarg);
 					break;
-				} else if(arg_value < 0) {
-					printf("No values smaller then 0 allowed.\n");
+				} else if(arg_value < parameter_list[i].min_value || arg_value > parameter_list[i].max_value) {
+					printf(
+						"The value '%ld' for flag '%c' did not fit the allowed range of [%d, %d]\n",
+						arg_value,
+						c,
+						parameter_list[i].min_value,
+						parameter_list[i].max_value
+					);
 					break;
 				}
 				printf("Flag '%c' has value %ld.\n", c, arg_value);
