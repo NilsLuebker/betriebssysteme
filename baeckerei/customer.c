@@ -42,7 +42,7 @@ void customer_stroll(void)
 
 void customer_init(customer_t* customer)
 {
-	customer->wanted_breads = (int)((random() % 5) + 1);
+	customer->wanted_breads = (int)((random() % (b * 2)) + 1);
 	customer->gotten_breads = 0;
 	customer->vendor = 0;
 	sem_init(&customer->sem, 0, 0);
