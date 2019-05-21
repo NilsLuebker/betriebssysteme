@@ -25,11 +25,13 @@ int main(int argc, char* argv[])
 	{
 		pthread_t customer_thread;
 		pthread_create(&customer_thread, NULL, &customer_thread_main, (void*) customer_new());
+		pthread_detach(customer_thread);
 	}
 	for(int i = 0; i < n; i++)
 	{
 		pthread_t vendor_thread;
 		pthread_create(&vendor_thread, NULL, &vendor_thread_main, (void*) NULL);
+		pthread_detach(vendor_thread);
 	}
 
 	printf("starting: main id[%lu]\n", pthread_self());
