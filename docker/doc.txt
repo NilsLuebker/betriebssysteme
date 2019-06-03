@@ -1,0 +1,10 @@
+docker stats:
+
+no limit:
+cpu: 100%   |   mem: 1.5GiB
+
+limit --cpus=.5
+cpu: 50%    |   mem: 1.5GiB
+
+limit --memory=1G
+cpu: 42%    |   mem: 1GiB (100%)

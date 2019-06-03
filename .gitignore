@@ -3,4 +3,5 @@
 .gdb_history
 shell
 baeckerei/baeckerei
+docker/main
 .vscode
